@@ -1,0 +1,6 @@
+{
+  "name": "Webit/imagewidthspecificationwizard",
+  "description": "This backendextension attaches a selectfield to contentelements like textpic or images to provide a set of default values for the width of an image (eg.: fullsize, half of the content, small teaser etc.).",
+  "type": "typo3-cms-extension",
+  "version": "0.3.1"
+}
