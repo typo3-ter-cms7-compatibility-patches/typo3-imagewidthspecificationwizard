@@ -39,10 +39,10 @@
  *
  */
 
-if(defined('PATH_t3lib')) {	
+if(defined('PATH_t3lib')) {
 	require_once(PATH_t3lib . 'class.t3lib_befunc.php');
+	require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang','lang.php'));
 }
-require_once(t3lib_extMgm::extPath('lang','lang.php'));
 
 /**
  * Class which adds a wizard to imagewidthfield of the tt_content table
