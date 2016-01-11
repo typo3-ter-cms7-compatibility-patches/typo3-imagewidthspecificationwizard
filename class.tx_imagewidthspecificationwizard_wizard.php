@@ -64,12 +64,12 @@ class tx_imagewidthspecificationwizard_wizard {
 	 */
 	function main(&$params,&$pObj)	{
 		// locallang
-		$this->lang = t3lib_div::makeInstance('language');
+		$this->lang = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
 		$this->lang->init($BE_USER->uc['lang']);
 		$this->lang->includeLLFile('EXT:' . $this->extKey . '/locallang.xml');
 
 		// fetch TSconfig/UserTSConfig for current page
-		$modTSconfig = t3lib_BEfunc::getModTSconfig($params['row']['pid'], 'tx_' . $this->extKey);
+		$modTSconfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig($params['row']['pid'], 'tx_' . $this->extKey);
 		ksort($modTSconfig['properties']['sizes.'], SORT_NUMERIC);
 
 		// generate a unique id for the wizardfield
