@@ -63,10 +63,6 @@ class tx_imagewidthspecificationwizard_wizard {
 	 * @return	string		Returns HTML for the wizard
 	 */
 	function main(&$params,&$pObj)	{
-		// locallang
-		$this->lang = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-		$this->lang->init($BE_USER->uc['lang']);
-		$this->lang->includeLLFile('EXT:' . $this->extKey . '/locallang.xml');
 
 		// fetch TSconfig/UserTSConfig for current page
 		$modTSconfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig($params['row']['pid'], 'tx_' . $this->extKey);
@@ -119,7 +115,7 @@ class tx_imagewidthspecificationwizard_wizard {
 			$modTSconfig['properties']['ownValueDisabled'] == true && ($this->fieldsMatch == false && !empty($imagewidth))) {
 			$selected = ($this->fieldsMatch == false && !empty($imagewidth))? ' selected="selected"': '';
 			//if(empty($modTSconfig['properties']['ownValueLabel'])) {
-			//	$modTSconfig['properties']['ownValueLabel'] = $this->lang->getLL('tt_content.tx_imagewidthspecificationwizard.ownValueLabel');
+			//	$modTSconfig['properties']['ownValueLabel'] = $GLOBALS['LANG']->getLL('tt_content.tx_imagewidthspecificationwizard.ownValueLabel');
 			//}
 			$options = '<option value="--div--"' . $selected . '>' .
 				$this->getLabel($modTSconfig['properties']['ownValueLabel']) . '</option>' . $options;
@@ -127,7 +123,7 @@ class tx_imagewidthspecificationwizard_wizard {
 		// prepend option to use no value / clear the field imagewidth (»0« triggers the JavaScript the clear the field automatically)
 		if ($modTSconfig['properties']['noValueDisabled'] == false) {
 			//if(empty($modTSconfig['properties']['noValueLabel'])) {
-			//	$modTSconfig['properties']['noValueLabel'] = $this->lang->getLL('tt_content.tx_imagewidthspecificationwizard.noValueLabel');
+			//	$modTSconfig['properties']['noValueLabel'] = $GLOBALS['LANG']->getLL('tt_content.tx_imagewidthspecificationwizard.noValueLabel');
 			//}
 			$options = '<option value="0">' . $this->getLabel($modTSconfig['properties']['noValueLabel']) .
 				'</option>' . $options;
@@ -215,7 +211,7 @@ class tx_imagewidthspecificationwizard_wizard {
 	function getLabel($label, $labelAlternative = false) {
 		$content = $label;
 		if(substr($label, 0, 3) == 'LLL') {
-			$content = $this->lang->sL($label);
+			$content = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($label, $this->extKey);
 			if ($content == false && !empty($labelAlternative)) {
 				$content = $labelAlternative;
 			}
