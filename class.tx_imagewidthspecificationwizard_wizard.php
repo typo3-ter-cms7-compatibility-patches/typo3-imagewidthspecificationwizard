@@ -148,17 +148,17 @@ class tx_imagewidthspecificationwizard_wizard {
 			// user has selected something else than "own value" (flag --div--) → change
 			// the value of the imagewidth field
 			'if (this.options[this.selectedIndex].value != \'--div--\') {
-				document.editform[\'data[tt_content][' . $uid . '][imagewidth]_hr\'].value = this.options[this.selectedIndex].value;' .
+				document.editform[\'data[tt_content][' . $uid . '][imagewidth]\'].value = this.options[this.selectedIndex].value;' .
 				// if configuration says so then the imagewidth field is shielded
 				(($hideField)?
-					'document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]_hr\')[0].parentNode.style.display = \'none\';'
+					'document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]\')[0].parentNode.style.display = \'none\';'
 					: ''
 				) .
 			'}' .
 			// if configuration allows own values, than the original imagewidth field is restored
 			((!$ownValueDisabled)?
 				'else {
-					document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]_hr\')[0].parentNode.style.display = \'inline\';
+					document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]\')[0].parentNode.style.display = \'inline\';
 				}' : ''
 			) .
 			'this.blur();
@@ -179,7 +179,7 @@ class tx_imagewidthspecificationwizard_wizard {
 	 */
 	function getSelectfield($uid, $collide, $JSonchange, $options) {
 		$content = '<select onchange="' . $JSonchange . '"' .
-			' name"_WIZARD[tt_content][' . $params['row']['uid'] . '][imagewidth]"' .
+			' name="_WIZARD[tt_content][' . $params['row']['uid'] . '][imagewidth]"' .
 			' class="tceforms-select tceforms-wizardselect"' .
 			' id="tceforms-select-' . $collide . '">' .
 			$options .
