@@ -1,6 +1,30 @@
 Changelog
 =========
 
+2016-09-05 Dan Untenzu <untenzu@webit.de>
+
+  * 2.1.0
+  * BUGFIX Adjust name attribute of imagewidth selector
+  * FEATURE Adjust field names due to form changes in TYPO3 CMS 7
+    * Thanks to @jokumer for the hotfix!
+  * FEATURE Adjust JavaScript onload hook
+  * FEATURE Add new extension icon
+  * TASK Set compatible TYPO3 versions (6.2 & 7.6)
+
+2016-09-05 Dan Untenzu <untenzu@webit.de>
+
+  * 2.0.0
+  * FEATURE Add composer
+  * !! TASK Move all extension files into the root directory
+
+2016-08-25 Dan Untenzu <untenzu@webit.de>
+
+  * 1.0.0
+  * TASK Set compatible TYPO3 versions (6.2)
+  * FEATURE Show warning if TSconfig is empty
+  * FEATURE Convert locallang translation files from XML to XLF
+  * FEATURE Remove deprecated functions
+
 2014-08-21 Dan Untenzu <untenzu@webit.de>
 
   * 0.3.1

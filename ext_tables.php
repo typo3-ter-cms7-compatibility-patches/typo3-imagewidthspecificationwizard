@@ -13,5 +13,5 @@ $wizardConfig = array(
 	'userFunc' => 'EXT:imagewidthspecificationwizard/class.tx_imagewidthspecificationwizard_wizard.php:tx_imagewidthspecificationwizard_wizard->main',
 );
 
-$TCA['tt_content']['columns']['imagewidth']['config']['wizards']['tx_imagewidthspecificationwizard_widthselection']= $wizardConfig;
+$TCA['tt_content']['columns']['imagewidth']['config']['wizards']['tx_imagewidthspecificationwizard_widthselection'] = $wizardConfig;
 ?>

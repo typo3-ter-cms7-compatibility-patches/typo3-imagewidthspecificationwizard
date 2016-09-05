@@ -14,27 +14,18 @@ $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Wizard for imagewidth field',
 	'description' => 'This backendextension attaches a selectfield to contentelements like textpic or images to provide a set of default values for the width of an image (eg.: fullsize, half of the content, small teaser etc.).',
 	'category' => 'be',
-	'shy' => 0,
-	'version' => '0.3.1',
-	'dependencies' => 'cms',
-	'conflicts' => '',
-	'priority' => '',
-	'loadOrder' => '',
-	'module' => '',
-	'state' => 'stable',
-	'uploadfolder' => 0,
-	'createDirs' => '',
-	'modify_tables' => '',
-	'clearcacheonload' => 0,
-	'lockType' => '',
 	'author' => 'Dan Untenzu',
 	'author_email' => 'untenzu@webit.de',
 	'author_company' => '',
-	'CGLcompliance' => '',
-	'CGLcompliance_note' => '',
+	'state' => 'stable',
+	'uploadfolder' => 0,
+	'createDirs' => '',
+	'clearCacheOnLoad' => 1,
+	'version' => '2.1.0',
 	'constraints' => array(
 		'depends' => array(
-			'typo3' => '7.6.0-7.6.99',
+			'php' => '5.5.0-7.0.99',
+			'typo3' => '6.2.0-7.6.99',
 			'cms' => '',
 		),
 		'conflicts' => array(
@@ -42,16 +33,6 @@ $EM_CONF[$_EXTKEY] = array(
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => '',
-	'suggests' => array(
-	),
-	'autoload' =>
-			array(
-					'classmap' => array(
-							'class.tx_imagewidthspecificationwizard_wizard.php',
-					)
-			),
-
 );
 
 ?>

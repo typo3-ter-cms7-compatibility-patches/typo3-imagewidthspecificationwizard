@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2010-2011 Dan Untenzu <untenzu@webit.de>
+*  (c) Dan Untenzu <untenzu@webit.de>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -21,28 +21,6 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-/**
- * [CLASS/FUNCTION INDEX of SCRIPT]
- *
- *
- *
- *   52: class tx_imagewidthspecificationwizard_wizard
- *   63:     function main(&$params,&$pObj)
- *   99:     function getOptions(&$modTSconfig, $imagewidth)
- *  147:     function getJSonchange($uid, $hideField, $ownValueDisabled)
- *  178:     function getSelectfield($uid, $collide, $JSonchange, $options)
- *  195:     function getJSpost($uid, $hideField)
- *  210:     function getLabel($label, $labelAlternative = false)
- *
- * TOTAL FUNCTIONS: 6
- * (This index is automatically created/updated by the extension "extdeveval")
- *
- */
-
-if(defined('PATH_t3lib')) {
-	require_once(PATH_t3lib . 'class.t3lib_befunc.php');
-	require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang','lang.php'));
-}
 
 /**
  * Class which adds a wizard to imagewidthfield of the tt_content table
@@ -55,6 +33,12 @@ class tx_imagewidthspecificationwizard_wizard {
 	var $extKey = 'imagewidthspecificationwizard'; // The extension key.
 
 	/**
+	 * Remember whether the current imagewidth eqals one of the preconfigured sizes
+	 * @var bool
+	 */
+	protected $fieldsMatch = FALSE;
+
+	/**
 	 * Generate the HTML-code for the wizard attached next to every imagewidth-field within
 	 * the TYPO3 backend
 	 *
@@ -62,8 +46,7 @@ class tx_imagewidthspecificationwizard_wizard {
 	 * @param	object		Parent object
 	 * @return	string		Returns HTML for the wizard
 	 */
-	function main(&$params,&$pObj)	{
-
+	function main(&$params, &$pObj) {
 		// fetch TSconfig/UserTSConfig for current page
 		$modTSconfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig($params['row']['pid'], 'tx_' . $this->extKey);
 		ksort($modTSconfig['properties']['sizes.'], SORT_NUMERIC);
@@ -73,17 +56,17 @@ class tx_imagewidthspecificationwizard_wizard {
 
 		$this->fieldsMatch = false;
 		$options = $this->getOptions($modTSconfig, $params['row']['imagewidth']);
-		// force script to hide the imagewidthfield
+		// force script to hide the imagewidthfield if TSconfig says so
 		if ($modTSconfig['properties']['ownValueDisabled'] == true) {
 			$modTSconfig['properties']['hideFieldOnMatch'] = true;
 			$this->fieldsMatch = true;
 		}
-		$JSonchange = $this->getJSonchange($params['row']['uid'], $modTSconfig['properties']['hideFieldOnMatch'], $modTSconfig['properties']['ownValueDisabled']);
+		$JSonchange = $this->getJSonchange($params['row']['uid'], $params['itemName'], $modTSconfig['properties']['hideFieldOnMatch'], $modTSconfig['properties']['ownValueDisabled']);
 
-		$content = $this->getSelectfield($params['row']['uid'], $collide, $JSonchange, $options);
+		$content = $this->getSelectfield($params['itemName'], $collide, $JSonchange, $options);
 
-		$JSpost = $this->getJSpost($params['row']['uid'], $modTSconfig['properties']['hideFieldOnMatch'], $this->fieldsMatch);
-		$pObj->additionalJS_post[] = $JSpost;
+		$JSpost = $this->getJSpost($params['itemName'], $modTSconfig['properties']['hideFieldOnMatch'], $this->fieldsMatch);
+		$content .= '<script>' . $JSpost . '</script>';
 
 		return $content;
 	}
@@ -94,8 +77,15 @@ class tx_imagewidthspecificationwizard_wizard {
 	 * @param	string		the current imagewidth of the contentelement
 	 * @return	string		HTML-String with all needed OPTION-tags of the selectfield
 	 */
-	function getOptions(&$modTSconfig, $imagewidth){
+	function getOptions($modTSconfig, $imagewidth){
 		$options = '';
+
+		if(TRUE === (empty($modTSconfig['properties']))) {
+			$options = '<option value="--div--">'
+				. \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('tt_content.tx_imagewidthspecificationwizard.configurationneeded', $this->extKey)
+				. '</option>';
+			return $options;
+		}
 
 		// generate list of predefined values
 		foreach($modTSconfig['properties']['sizes.'] as $size => $description) {
@@ -114,19 +104,15 @@ class tx_imagewidthspecificationwizard_wizard {
 		if ($modTSconfig['properties']['ownValueDisabled'] == false ||
 			$modTSconfig['properties']['ownValueDisabled'] == true && ($this->fieldsMatch == false && !empty($imagewidth))) {
 			$selected = ($this->fieldsMatch == false && !empty($imagewidth))? ' selected="selected"': '';
-			//if(empty($modTSconfig['properties']['ownValueLabel'])) {
-			//	$modTSconfig['properties']['ownValueLabel'] = $GLOBALS['LANG']->getLL('tt_content.tx_imagewidthspecificationwizard.ownValueLabel');
-			//}
-			$options = '<option value="--div--"' . $selected . '>' .
-				$this->getLabel($modTSconfig['properties']['ownValueLabel']) . '</option>' . $options;
+			$options = '<option value="--div--"' . $selected . '>'
+				. $this->getLabel($modTSconfig['properties']['ownValueLabel'])
+				. '</option>' . $options;
 		}
 		// prepend option to use no value / clear the field imagewidth (»0« triggers the JavaScript the clear the field automatically)
 		if ($modTSconfig['properties']['noValueDisabled'] == false) {
-			//if(empty($modTSconfig['properties']['noValueLabel'])) {
-			//	$modTSconfig['properties']['noValueLabel'] = $GLOBALS['LANG']->getLL('tt_content.tx_imagewidthspecificationwizard.noValueLabel');
-			//}
-			$options = '<option value="0">' . $this->getLabel($modTSconfig['properties']['noValueLabel']) .
-				'</option>' . $options;
+			$options = '<option value="0">'
+				. $this->getLabel($modTSconfig['properties']['noValueLabel'])
+				. '</option>' . $options;
 		}
 
 		$this->fieldsMatch = ($this->fieldsMatch == false && empty($imagewidth))? true:$this->fieldsMatch;
@@ -139,47 +125,47 @@ class tx_imagewidthspecificationwizard_wizard {
 	 * a different value in the wizard
 	 *
 	 * @param	string		The uid of the current contentelement
+	 * @param	string		The distinct name of the imagewidth field in the current content element
 	 * @param	bool		Hide the imagewidthfield if a configured value/width is selected (TSconfig)
 	 * @param	bool		Allow the possibility to use an individual value for the imagewidth
 	 * @return	string		Returns the valid JavaScript for the onchange-attribute
 	 */
-	function getJSonchange($uid, $hideField, $ownValueDisabled) {
+	function getJSonchange($uid, $fieldName, $hideField, $ownValueDisabled) {
+		// Double escape JavaScript since its located inside of HTML-tag attributes wraped with quotes
 		$content =
 			// user has selected something else than "own value" (flag --div--) → change
 			// the value of the imagewidth field
 			'if (this.options[this.selectedIndex].value != \'--div--\') {
-				document.editform[\'data[tt_content][' . $uid . '][imagewidth]_hr\'].value = this.options[this.selectedIndex].value;' .
+				document.editform[\'' . $fieldName . '\'].value = this.options[this.selectedIndex].value;' .
 				// if configuration says so then the imagewidth field is shielded
 				(($hideField)?
-					'document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]_hr\')[0].parentNode.style.display = \'none\';'
+					'document.getElementsByName(\'' . $fieldName . '\')[0].parentNode.style.display = \'none\';'
 					: ''
 				) .
 			'}' .
 			// if configuration allows own values, than the original imagewidth field is restored
 			((!$ownValueDisabled)?
 				'else {
-					document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]_hr\')[0].parentNode.style.display = \'inline\';
+					document.getElementsByName(\'' . $fieldName . '\')[0].parentNode.style.display = \'inline\';
 				}' : ''
 			) .
-			'this.blur();
-			/*this.selectedIndex = 0;*/
-			typo3form.fieldGet(\'data[tt_content][' . $uid . '][imagewidth]\',\'int\',\'\',1,\'0\');
-			TBE_EDITOR.fieldChanged(\'tt_content\',\'' . $uid . '\',\'imagewidth\',\'data[tt_content][' . $uid . '][imagewidth]\');
+			'typo3form.fieldGet(\'data[tt_content][' . $uid . '][imagewidth]\', \'int\', \'\', 1, \'0\');
+			TBE_EDITOR.fieldChanged(\'tt_content\',\'' . $uid . '\', \'imagewidth\', \'data[tt_content][' . $uid . '][imagewidth]\');
 			';
 		return $content;
 	}
 
 	/* Generate the HTML for the selectfield
 	 *
-	 * @param	string		The uid of the current contentelement
+	 * @param	string		The distinct name of the imagewidth field in the current content element
 	 * @param	string		Unique id for the wizardfield
 	 * @param	string		JavaScript for the onchange-attribute of the select field
 	 * @param	string		HTML string containing all options of the selectfield
 	 * @return	string		HTML of the wizards selectfield
 	 */
-	function getSelectfield($uid, $collide, $JSonchange, $options) {
+	function getSelectfield($fieldName, $collide, $JSonchange, $options) {
 		$content = '<select onchange="' . $JSonchange . '"' .
-			' name"_WIZARD[tt_content][' . $params['row']['uid'] . '][imagewidth]"' .
+			' name="_WIZARD' . $fieldName . '"' .
 			' class="tceforms-select tceforms-wizardselect"' .
 			' id="tceforms-select-' . $collide . '">' .
 			$options .
@@ -190,14 +176,14 @@ class tx_imagewidthspecificationwizard_wizard {
 	/* Hide the field imagewidth if TSconfig-option »hideFieldOnMatch« equals true and
 	 * the current imagewidth eqals one of the preconfigured sizes
 	 *
-	 * @param	string		The uid of the current contentelement
+	 * @param	string		The distinct name of the imagewidth field in the current content element
 	 * @param	bool		Hide the imagewidthfield if a given value/width is selected (TSconfig)
 	 * @return	string		Returns the JavaScript for TYPO3 $additionalJS_post (appended to form)
 	 */
-	function getJSpost($uid, $hideField) {
+	function getJSpost($fieldName, $hideField) {
 		$content = '';
 		if($hideField && $this->fieldsMatch) {
-			$content = 'document.getElementsByName(\'data[tt_content][' . $uid . '][imagewidth]\')[0].parentNode.style.display = \'none\';';
+			$content = 'document.getElementsByName(\'' . $fieldName . '\')[0].parentNode.style.display = \'none\';';
 		}
 		return $content;
 	}
@@ -208,11 +194,11 @@ class tx_imagewidthspecificationwizard_wizard {
 	 * @param	string	Alternative string to use, if no translation is found
 	 * @return	string	The label string - either the original string or the translated value (translated / alternative string if no translation is found but an alternativ string is given / FALSE if no translation is found & an alternativ string isn't given)
 	 */
-	function getLabel($label, $labelAlternative = false) {
+	function getLabel($label, $labelAlternative = FALSE) {
 		$content = $label;
 		if(substr($label, 0, 3) == 'LLL') {
 			$content = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($label, $this->extKey);
-			if ($content == false && !empty($labelAlternative)) {
+			if ($content == FALSE && !empty($labelAlternative)) {
 				$content = $labelAlternative;
 			}
 		}
@@ -221,7 +207,4 @@ class tx_imagewidthspecificationwizard_wizard {
 
 }
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/imagewidthspecificationwizard/class.tx_imagewidthspecificationwizard_wizard.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/imagewidthspecificationwizard/class.tx_imagewidthspecificationwizard_wizard.php']);
-}
 ?>
